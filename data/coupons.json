@@ -1,0 +1,12 @@
+[
+    {
+        "id": "SAVE15",
+        "type": "discount",
+        "discount": 0.15
+    },
+    {
+        "id": "SAVE50",
+        "type": "discount",
+        "discount": 0.50
+    }
+]
