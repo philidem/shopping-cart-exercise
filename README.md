@@ -38,10 +38,10 @@ npm start
 - Make changes until all tests pass
 
 ### Bonus Points
-- Create stub routes that the REST API for the shopping cart CRUD operations.
-  Assume that each shopping cart is associated with a unique session ID.
-  You should add the routes to `server.js` which already has the code
-  in place to launch a simple `express` server. You can also choose to use
+- Create a REST API for the shopping cart CRUD operations.
+  Assume that each shopping cart is associated with a unique session ID
+  that will be sent as a cookie. The file `server.js` has the code in
+  place to launch a simple `express` server, but you can also choose to use
   a different server/router as well. For clarity, you may wish to provide
   a sample response for each REST API route.
 
