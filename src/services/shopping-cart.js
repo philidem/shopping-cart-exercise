@@ -37,8 +37,14 @@ ShoppingCart.prototype = {
     function(err, items)
     */
     getItems: function(callback) {
-        // TODO: Implement
-    },
+
+        if (typeof callback === "function") {
+        callback(null, this.items);
+        } else {
+            callback("Error: getItems called without a valid function as a parameter.")
+        }
+
+   },
 
     /*
     Invoke the callback with the ShoppingCartItem associated with the
@@ -50,6 +56,22 @@ ShoppingCart.prototype = {
     */
     getItemByProductId: function(productId, callback) {
         // TODO: Implement
+
+        var itemFound = null;
+
+        for (var i = 0; i < this.items.length; i++) {
+
+                if (this.items[i].product.id == productId) {
+                    itemFound = this.items[i];
+                }
+        }
+
+        if (itemFound != null) {
+            callback (null, itemFound);
+        } else {
+            callback (null, null);
+        }
+
     },
 
     /*
@@ -65,7 +87,39 @@ ShoppingCart.prototype = {
     function(err, item)
     */
     addItem: function(productId, quantity, callback) {
-        // TODO: Implement
+
+        var that = this;
+
+        this.getItemByProductId(productId, function(err, itemFound) {
+
+            if (itemFound != null) {
+
+                itemFound.quantity += quantity;
+                callback(null, itemFound);
+
+            } else {
+
+                productsService.getProductById(productId, function(err, productFound) {
+                    if (err) {
+
+                        callback("Error. Failed attempt to add product to shoppingt cart.  No product found for given productId.");
+
+                    } else {
+
+                        newItem = new ShoppingCartItem(productFound);
+                        newItem.quantity = quantity;
+                        that.items.push(newItem);
+                        callback(null, newItem);
+
+                    }
+                });
+
+            }
+
+        });
+
+
+
     },
 
     /*
@@ -81,7 +135,38 @@ ShoppingCart.prototype = {
     function(err, item)
     */
     updateItemQuantity: function(productId, quantity, callback) {
-        // TODO: Implement
+
+        var that = this;
+
+        this.getItemByProductId(productId, function(err, itemFound) {
+
+            if (itemFound != null) {
+
+                itemFound.quantity = quantity;
+                callback(null, itemFound);
+
+            } else {
+
+                productsService.getProductById(productId, function(err, productFound) {
+                    if (err) {
+
+                        callback("Error. Failed attempt to update product quantities.  Invalid productId.");
+
+                    } else {
+
+                        newItem = new ShoppingCartItem(productFound);
+                        newItem.quantity = quantity;
+                        that.items.push(newItem);
+                        callback(null, newItem);
+
+                    }
+                });
+
+            }
+
+        });
+
+
     },
 
     /*
@@ -92,7 +177,17 @@ ShoppingCart.prototype = {
     function(err)
     */
     removeItem: function(productId, callback) {
-        // TODO: Implement
+
+        for (var i = 0; i < this.items.length; i++) {
+
+                if (this.items[i].product.id == productId) {
+                    this.items.splice(i,1);
+                    break;
+                }
+        }
+
+        callback(null);
+
     },
 
     /*
@@ -101,7 +196,17 @@ ShoppingCart.prototype = {
     NOTE: Only "discount" type coupons need to be handled.
     */
     getTotal: function() {
-        // TODO: Implement
+
+        var shoppingCartTotal = 0;
+
+        for (var i = 0; i < this.items.length; i++) {
+
+            shoppingCartTotal += (this.items[i].getProduct().price * this.items[i].getQuantity());
+
+        }
+
+        return shoppingCartTotal;
+
     },
 
     /*
@@ -119,7 +224,26 @@ ShoppingCart.prototype = {
     function(err, coupon)
     */
     applyCoupon: function(couponId, callback) {
-        // TODO: Implement
+
+        var that = this;
+
+        couponsService.getCouponById(couponId, function(err, coupon) {
+
+            if (err) {
+                callback(err);
+            }
+
+            for (var i=0; i< that.coupons.length; i++) {
+                if (that.coupons[i].coupon.type == coupon.type) {
+                    that.coupons.splice(i, 1);
+                }
+            }
+
+            that.coupons.push(coupon);
+            callback(null, coupon);
+
+        });
+
     },
 
     /*
@@ -129,7 +253,10 @@ ShoppingCart.prototype = {
     function(err, coupons)
     */
     getCoupons: function(callback) {
-        // TODO: Implement
+
+        couponsService.getCoupons(function(err, coupons) {
+            callback (err, coupons);
+        });
     }
 };
 
